@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from hw_helper_interface import HWHelperInterface
+from HWHelperInterface import HWHelperInterface
 
 class HomeworkHelperGUI(HWHelperInterface):
     def __init__(self):

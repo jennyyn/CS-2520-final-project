@@ -5,7 +5,7 @@ from datetime import datetime
 from datetime import datetime
 
 class Assignment:
-    """Represents a single assignment."""
+    """Components of an assignment"""
     
     def __init__(self, name: str, subject: str, deadline: datetime, status: str = "not started"):
         self.HWname = name
@@ -15,7 +15,7 @@ class Assignment:
 
 
 class AssignmentTracker:
-    """Tracks and organizes assignments by due date."""
+    """Tracks and organizes assignments by due date"""
     
     def __init__(self):
         self.assignments = []
@@ -28,8 +28,17 @@ class AssignmentTracker:
         """Returns assignments sorted by deadline."""
         return sorted(self.assignments, key=lambda a: a.deadline)
     
+    def in_progress(self, HWname: str):
+        """Marks an assignment as in progress"""
+        for a in self.assignments:
+            if a.HWname.lower() == HWname.lower():
+                a.status ="in progress"
+                return True
+        return False
+
+    
     def mark_done(self, HWname: str): #Activated by a button in gui?
-        """Marks an assignment as done by name."""
+        """Marks an assignment as done"""
         for a in self.assignments:
             if a.HWname.lower() == HWname.lower():
                 a.status = "done"
@@ -49,7 +58,8 @@ tracker.add_assignment("Program", "Python", d2)
 
 #Mark one done
 tracker.mark_done("Essay")
+tracker.in_progress("Program")
 
-#Print sorted list
+#Print assignments
 for a in tracker.list_assignments():
     print(a.HWname, "for", a.subject, "due", a.deadline, "\nStatus:", a.status, "\n")

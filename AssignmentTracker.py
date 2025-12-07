@@ -44,22 +44,3 @@ class AssignmentTracker:
                 a.status = "done"
                 return True
         return False
-
-#Terminal output for testing, comment out/delete for final product
-tracker = AssignmentTracker()
-
-#Create deadlines
-d1 = datetime(2025, 1, 10, 23, 59)
-d2 = datetime(2025, 1, 5, 12, 00)
-
-#Add assignments
-tracker.add_assignment("Essay", "English", d1)
-tracker.add_assignment("Program", "Python", d2)
-
-#Mark one done
-tracker.mark_done("Essay")
-tracker.in_progress("Program")
-
-#Print assignments
-for a in tracker.list_assignments():
-    print(a.HWname, "for", a.subject, "due", a.deadline, "\nStatus:", a.status, "\n")

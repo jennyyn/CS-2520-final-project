@@ -25,7 +25,7 @@ class HomeworkHelperGUI(HWHelperInterface):
 
 
         self.root.title("Homework Helper")
-        self.root.geometry("400x300")
+        self.root.geometry("500x400")
 
 
         # label
@@ -52,7 +52,118 @@ class HomeworkHelperGUI(HWHelperInterface):
         messagebox.showinfo("GPA Calculator", "This feature will calculate your GPA based on your grades.")
 
     def assignmentTracker(self):
-        messagebox.showinfo("Assignment Tracker", "This feature will help you track your assignments.")
+        tracker_window = tk.Toplevel(self.root)
+        tracker_window.title("Assignment Tracker")
+        tracker_window.geometry("600x500")
+
+        # Title
+        tk.Label(tracker_window, text="Assignment Tracker", font=("Helvetica", 16)).pack(pady=10)
+
+        # Assignment input gui components
+        form = tk.Frame(tracker_window)
+        form.pack(pady=10)
+
+        tk.Label(form, text="Assignment Name:").grid(row=0, column=0)
+        entry_name = tk.Entry(form)
+        entry_name.grid(row=0, column=1)
+
+        tk.Label(form, text="Subject:").grid(row=1, column=0)
+        entry_subject = tk.Entry(form)
+        entry_subject.grid(row=1, column=1)
+
+        tk.Label(form, text="Deadline (YYYY-MM-DD HH:MM):").grid(row=2, column=0)
+        entry_deadline = tk.Entry(form)
+        entry_deadline.grid(row=2, column=1)
+
+        # Add new assignment
+        def add_assignment_gui():
+            name = entry_name.get().strip()
+            subject = entry_subject.get().strip()
+            deadline_text = entry_deadline.get().strip()
+
+            if not name or not subject or not deadline_text:
+                messagebox.showerror("Error", "All fields are required.")
+                return
+
+            try:
+                deadline = datetime.strptime(deadline_text, "%Y-%m-%d %H:%M")
+            except:
+                messagebox.showerror("Error", "Deadline must be in format YYYY-MM-DD HH:MM")
+                return
+
+            self.tracker.add_assignment(name, subject, deadline)
+            refresh_list()
+            messagebox.showinfo("Success", "Assignment added!")
+
+        # Delete assignment from list
+        def delete_assignment_gui():
+            selection = listbox.curselection()
+            if not selection:
+                messagebox.showwarning("Select one", "You must select an assignment to delete.")
+                return
+
+            index = selection[0]
+            assignment = self.tracker.list_assignments()[index]
+
+            confirm = messagebox.askyesno(
+                "Confirm Delete",
+                f"Delete assignment '{assignment.HWname}'?"
+            )
+            if confirm:
+                # Remove from internal list
+                self.tracker.assignments.remove(assignment)
+                refresh_list()
+                messagebox.showinfo("Deleted", "Assignment removed.")
+
+        # Add/Delete buttons beside each other
+        tk.Button(form, text="Add Assignment", command=add_assignment_gui).grid(row=3, column=0, pady=10)
+        tk.Button(form, text="Delete Assignment", command=delete_assignment_gui).grid(row=3, column=1, pady=10)
+
+        # Listbox for assignment display
+        list_frame = tk.Frame(tracker_window)
+        list_frame.pack(fill=tk.BOTH, expand=True)
+
+        scrollbar = tk.Scrollbar(list_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        listbox = tk.Listbox(list_frame, width=60, height=15, yscrollcommand=scrollbar.set)
+        listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=listbox.yview)
+
+        # Update the listbox in gui
+        def refresh_list():
+            listbox.delete(0, tk.END)
+            for a in self.tracker.list_assignments():
+                line = f"{a.HWname} | {a.subject} | Due: {a.deadline.strftime('%Y-%m-%d %H:%M')} | Status: {a.status}"
+                listbox.insert(tk.END, line)
+
+        refresh_list()
+
+        # Status buttons
+        def mark_in_progress():
+            selection = listbox.curselection()
+            if not selection:
+                messagebox.showwarning("Select one", "You must select an assignment.")
+                return
+            name = self.tracker.list_assignments()[selection[0]].HWname
+            self.tracker.in_progress(name)
+            refresh_list()
+
+        def mark_done():
+            selection = listbox.curselection()
+            if not selection:
+                messagebox.showwarning("Select one", "You must select an assignment.")
+                return
+            name = self.tracker.list_assignments()[selection[0]].HWname
+            self.tracker.mark_done(name)
+            refresh_list()
+
+        btn_frame = tk.Frame(tracker_window)
+        btn_frame.pack(pady=10)
+
+        tk.Button(btn_frame, text="Mark In Progress", command=mark_in_progress).grid(row=0, column=0, padx=10)
+        tk.Button(btn_frame, text="Mark Done", command=mark_done).grid(row=0, column=1, padx=10)
+
 
     def whatIf(self):
         messagebox.showinfo("What If... Tool", "This feature will allow you to see how hypothetical grades affect your GPA.")

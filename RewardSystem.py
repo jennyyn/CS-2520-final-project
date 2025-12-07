@@ -1,17 +1,33 @@
+import random
 import tkinter as tk
 from PIL import Image, ImageTk
 from AssignmentTracker import AssignmentTracker
 
 class RewardSystem:
-    """Rewards of Assignment"""
+    """Contains Rewards"""
     def __init__(self):
-        self.empty = ImageTk.PhotoImage(Image.open("emptyPlant.png"))
-        self.half = ImageTk.PhotoImage(Image.open("growingPlant.png"))
+        self.empty = None
+        self.half = None
+        self.full_plants = []
 
+    def load_image(self):
+        self.empty = ImageTk.PhotoImage(Image.open("images/emptyPlant.png"))
+        self.half = ImageTk.PhotoImage(Image.open("images/growingPlant.png"))
         self.full_plants = [
-            ImageTk.PhotoImage(Image.open("flower1.png")),
-            ImageTk.PhotoImage(Image.open("flower2.png")),
-            ImageTk.PhotoImage(Image.open("flower3.png")),
-            ImageTk.PhotoImage(Image.open("flower4.png"))
+            ImageTk.PhotoImage(Image.open("images/flower1.png")),
+            ImageTk.PhotoImage(Image.open("images/flower2.png")),
+            ImageTk.PhotoImage(Image.open("images/flower3.png")),
+            ImageTk.PhotoImage(Image.open("images/flower4.png"))
         ]
+
+    def get_plant_for_status(self, status):
+        """Return the appropriate PhotoImage based on assignment status."""
+        if status == "not started":
+            return self.empty
+        elif status == "in progress":
+            return self.half
+        elif status == "complete":
+            return random.choice(self.full_plants)
+        else:
+            return self.empty  # default fallback
 

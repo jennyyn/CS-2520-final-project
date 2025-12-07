@@ -1,5 +1,6 @@
 from typing import List
 from course import Course
+from AssignmentTracker import Assignment
 
 class GPACalculator:
     """Manages a list of courses and calculates the GPA."""
@@ -31,3 +32,18 @@ class GPACalculator:
     def get_courses(self) -> List[Course]:
         """Returns the list of added courses."""
         return self.courses
+    
+    def calc_course_grade(assigments: List[Assignment]) -> float:
+        """Calculates the overall grade for a course based on its assignments."""
+        earned = 0.0
+        possible = 0.0
+
+        for a in assigments:
+            if a.points_earned is not None and a.points_possible is not None:
+                earned += a.points_earned
+                possible += a.points_possible
+
+        if possible == 0:
+            return None # no graded assignments
+        
+        return (earned / possible) * 100

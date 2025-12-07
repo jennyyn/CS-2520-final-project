@@ -11,13 +11,13 @@ class RewardSystem:
         self.full_plants = []
 
     def load_image(self):
-        self.empty = ImageTk.PhotoImage(Image.open("images/emptyPlant.png"))
-        self.half = ImageTk.PhotoImage(Image.open("images/growingPlant.png"))
+        self.empty = ImageTk.PhotoImage(Image.open("images/emptyPlant.png").resize((80,120)))
+        self.half = ImageTk.PhotoImage(Image.open("images/growingPlant.png").resize((80,120)))
         self.full_plants = [
-            ImageTk.PhotoImage(Image.open("images/flower1.png")),
-            ImageTk.PhotoImage(Image.open("images/flower2.png")),
-            ImageTk.PhotoImage(Image.open("images/flower3.png")),
-            ImageTk.PhotoImage(Image.open("images/flower4.png"))
+            ImageTk.PhotoImage(Image.open("images/flower1.png").resize((80,120))),
+            ImageTk.PhotoImage(Image.open("images/flower2.png").resize((80,120))),
+            ImageTk.PhotoImage(Image.open("images/flower3.png").resize((80,120))),
+            ImageTk.PhotoImage(Image.open("images/flower4.png").resize((80,120)))
         ]
 
     def get_plant_for_status(self, status):

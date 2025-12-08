@@ -19,7 +19,7 @@ We created a tool to help students manage assignments and their grades more effe
 2. **Assignment Tracker**  
    - Click the **Assignment Tracker** button.  
    - Add assignments by providing the name, subject, due date, and status.  
-   - Update assignments to “in progress” or “done” as you complete them.  
+   - Update assignments to “in progress” or “done” as you complete them by clicking on the assignment and the respective status buttons.  
    - Assignments are organized by due date.
 
 3. **GPA Calculator**  
@@ -27,8 +27,10 @@ We created a tool to help students manage assignments and their grades more effe
    - Enter your grades to calculate your current GPA quickly.
 
 4. **What-If Assignment Calculator**  
-   - Click the **What-If Tool** button.  
-   - Input hypothetical grades to see how they would affect your GPA.
+   - Click the **What-If Tool** button.
+   - Input a hypothetical assignment grade to see how it would affect the overall grade in a particular course.
+   - Add a hypothetical assignment by providing the subject, name, points earned, and points possible.
+   - Click "Calculate What-If Outcome" to predict the grade of the subject.
 
 5. **Rewards System**  
    - Click the **Rewards** button.  

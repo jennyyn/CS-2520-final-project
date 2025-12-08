@@ -41,8 +41,8 @@ class HomeworkHelperGUI(HWHelperInterface):
         self.gpaCalc = GPACalculator()
 
         # Example assignments for testing
-        self.tracker.add_assignment("Essay", "English", datetime(2025,1,10,23,59))
-        self.tracker.add_assignment("Program", "Python", datetime(2025,1,5,12,0))
+        self.tracker.add_assignment("Essay", "English", datetime(2025,1,10,23,59), 100)
+        self.tracker.add_assignment("Program", "Python", datetime(2025,1,5,12,0), 150)
         self.tracker.mark_done("Essay")
         self.tracker.in_progress("Program")
 
@@ -372,11 +372,16 @@ class HomeworkHelperGUI(HWHelperInterface):
         entry_deadline = tk.Entry(form, width=25)
         entry_deadline.grid(row=2, column=1, padx=10, pady=5)
 
+        tk.Label(form, text="Points Possible:", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=3, column=0)
+        entry_points = tk.Entry(form, width=25)
+        entry_points.grid(row=2, column=1, padx=10, pady=5)
+
         # Add new assignment
         def add_assignment_gui():
             name = entry_name.get().strip()
             subject = entry_subject.get().strip()
             deadline_text = entry_deadline.get().strip()
+            points_possible_text = entry_points.get().strip()
 
             if not name or not subject or not deadline_text:
                 messagebox.showerror("Error", "All fields are required.")
@@ -388,7 +393,7 @@ class HomeworkHelperGUI(HWHelperInterface):
                 messagebox.showerror("Error", "Deadline must be in format YYYY-MM-DD HH:MM")
                 return
 
-            self.tracker.add_assignment(name, subject, deadline)
+            self.tracker.add_assignment(name, subject, deadline, points_possible=float(points_possible_text) if points_possible_text else None)
             refresh_list()
             self.refresh_dashboard()
             messagebox.showinfo("Success", "Assignment added!")
@@ -408,7 +413,7 @@ class HomeworkHelperGUI(HWHelperInterface):
                 "Confirm Delete",
                 f"Delete assignment '{assignment.HWname}'?"
             )
-            
+
             if confirm:
                 # Remove from internal list
                 self.tracker.delete_assignment(assignment.HWname)
@@ -443,7 +448,7 @@ class HomeworkHelperGUI(HWHelperInterface):
         def refresh_list():
             listbox.delete(0, tk.END)
             for a in self.tracker.list_assignments():
-                line = f"{a.HWname} | {a.subject} | Due: {a.deadline.strftime('%Y-%m-%d %H:%M')} | Status: {a.status}"
+                line = f"{a.HWname} | {a.subject} | Points Possible: {a.points_possible} | Due: {a.deadline.strftime('%Y-%m-%d %H:%M')} | Status: {a.status}"
                 listbox.insert(tk.END, line)
 
         refresh_list()
@@ -469,6 +474,41 @@ class HomeworkHelperGUI(HWHelperInterface):
             refresh_list()
             self.refresh_dashboard()
 
+        def mark_graded():
+            selection = listbox.curselection()
+            if not selection:
+                messagebox.showwarning("Select one", "You must select an assignment.")
+                return
+            
+            assignment = self.tracker.list_assignments()[selection[0]]
+            name = assignment.HWname
+            points_possible = assignment.points_possible
+            
+            # popup to ask for points earned
+            popup = tk.Toplevel(tracker_window)
+            popup.title(f"Grade Assignment: {name}")
+            popup.geometry("300x150")
+            popup.configure(bg=COLOR_BG_MAIN)
+
+            tk.Label(popup, text=f"Enter points for '{name}':", font=("Helvetica", 12), bg=COLOR_BG_MAIN, fg=COLOR_TEXT).pack(pady=10)
+            entry_earned = tk.Entry(popup, width=15)
+            entry_earned.pack()
+
+            def submit_grade():
+                try:
+                    points_earned = float(entry_earned.get())
+                except ValueError:
+                    messagebox.showerror("Error", "Please enter a valid number for points earned.")
+                    return
+                
+            points_earned = submit_grade()
+
+            self.tracker.mark_graded(name, points_earned, points_possible)
+            popup.destroy()
+            refresh_list()
+            self.refresh_dashboard()
+            messagebox.showinfo("Success", "Assignment marked as graded.")
+
         btn_frame = tk.Frame(card, bg=COLOR_PANEL)
         btn_frame.pack(pady=10)
 
@@ -479,6 +519,10 @@ class HomeworkHelperGUI(HWHelperInterface):
         btn_done = tk.Button(btn_frame, text="Mark Done", command=mark_done)
         self.style_button(btn_done)
         btn_done.grid(row=1, column=1, padx=10)
+
+        btn_graded = tk.Button(btn_frame, text="Mark Graded", command=mark_graded)
+        self.style_button(btn_graded)
+        btn_graded.grid(row=1, column=2, padx=10)
 
 
     def whatIf(self):
@@ -557,8 +601,8 @@ class HomeworkHelperGUI(HWHelperInterface):
                     name=h["assignment"],
                     subject=h["course"],
                     deadline=datetime.now(),  # placeholder
-                    pointsEarned=h["points_earned"],
-                    maxPoints=h["points_possible"]
+                    points_earned=h["points_earned"],
+                    points_possible=h["points_possible"]
                 )
                 real_assignments.append(a)
 

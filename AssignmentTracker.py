@@ -7,11 +7,15 @@ from datetime import datetime
 class Assignment:
     """Components of an assignment"""
     
-    def __init__(self, name: str, subject: str, deadline: datetime, status: str = "not started"):
+    def __init__(self, name: str, subject: str, deadline: datetime, status: str = "not started", points_possible: float = None):
         self.HWname = name
         self.subject = subject
         self.deadline = deadline
         self.status = status
+
+        self.points_earned = None  # Points earned for the assignment
+        self.points_possible = None  # Total possible points for the assignment
+        self.grade = None  # Grade percentage for the assignment
 
 
 class AssignmentTracker:
@@ -54,3 +58,14 @@ class AssignmentTracker:
                 a.status = "done"
                 return True
         return False
+    
+    def mark_graded(self, HWname: str, points_earned: float):
+        """Marks an assignment as graded with points earned and possible"""
+        for a in self.assignments:
+            if a.HWname.lower() == HWname.lower():
+                a.status = "graded"
+                a.points_earned = points_earned
+                a.grade = (points_earned / a.points_possible) * 100 if points_possible > 0 else None
+                return True
+        return False
+    

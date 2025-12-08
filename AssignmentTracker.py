@@ -59,13 +59,13 @@ class AssignmentTracker:
                 return True
         return False
     
-    def mark_graded(self, HWname: str, points_earned: float, points_possible: float):
+    def mark_graded(self, HWname: str, points_earned: float):
         """Marks an assignment as graded with points earned and possible"""
         for a in self.assignments:
             if a.HWname.lower() == HWname.lower():
                 a.status = "graded"
                 a.points_earned = points_earned
-                a.points_possible = points_possible
-                self.grade = (points_earned / points_possible) * 100 if points_possible > 0 else None
+                a.grade = (points_earned / a.points_possible) * 100 if points_possible > 0 else None
                 return True
         return False
+    

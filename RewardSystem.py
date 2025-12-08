@@ -26,7 +26,7 @@ class RewardSystem:
             return self.empty
         elif status == "in progress":
             return self.half
-        elif status == "complete":
+        elif status == "complete" or "graded":
             return random.choice(self.full_plants)
         else:
             return self.empty  # default fallback

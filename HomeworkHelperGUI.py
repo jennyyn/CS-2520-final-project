@@ -690,7 +690,8 @@ class HomeworkHelperGUI(HWHelperInterface):
         status_map = {
             "not started": "not started",
             "in progress": "in progress",
-            "done": "complete"
+            "done": "complete",
+            "graded": "graded"
         }
 
         # Configuration

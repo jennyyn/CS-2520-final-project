@@ -440,7 +440,7 @@ class HomeworkHelperGUI(HWHelperInterface):
         def refresh_list():
             listbox.delete(0, tk.END)
             for a in self.tracker.list_assignments():
-                line = f"{a.HWname} | {a.subject} | Points Possible: {a.points_possible} | Due: {a.deadline.strftime('%Y-%m-%d %H:%M')} | Status: {a.status}"
+                line = f"{a.HWname} | {a.subject} | Points Possible: {a.points_possible} | Points Earned: {a.points_earned} | Due: {a.deadline.strftime('%Y-%m-%d %H:%M')} | Status: {a.status}"
                 listbox.insert(tk.END, line)
 
         refresh_list()
@@ -594,7 +594,7 @@ class HomeworkHelperGUI(HWHelperInterface):
                 messagebox.showerror("Error", "Please enter valid numeric values for points.")
                 return
             
-            if not hypothetical["name"] or not hypothetical["course"]:
+            if not hypothetical["assignment"] or not hypothetical["course"]:
                 messagebox.showerror("Error", "Course or Assignment Name cannot be empty.")
                 return
             

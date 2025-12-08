@@ -1,6 +1,8 @@
 # Homework Helper
 ## Overview
-We created a tool to help students manage assignments and their grades more effectively!
+We created a tool to help students manage assignments and their grades more effectively!  
+
+https://github.com/jennyyn/CS-2520-final-project
 
 ## Features and their purpose
 **1. Assignment Tracker -** Allows students to add, organize, and update assignments by due date, including marking them as "in progress", "done", or "not started"
@@ -39,6 +41,4 @@ We created a tool to help students manage assignments and their grades more effe
      - **Half-grown plant** = in progress  
      - **Fully grown plant** = completed (randomly chosen)  
    - Use the vertical scrollbar if there are many assignments.
-
-
 

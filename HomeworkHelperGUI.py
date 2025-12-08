@@ -440,7 +440,13 @@ class HomeworkHelperGUI(HWHelperInterface):
         def refresh_list():
             listbox.delete(0, tk.END)
             for a in self.tracker.list_assignments():
-                line = f"{a.HWname} | {a.subject} | Points Possible: {a.points_possible} | Points Earned: {a.points_earned} | Due: {a.deadline.strftime('%Y-%m-%d %H:%M')} | Status: {a.status}"
+                # Show points only if graded
+                if a.status.lower() == "graded":
+                    points_str = f"{a.points_earned}/{a.points_possible}"
+                else:
+                   points_str = ""
+
+                line = f"{a.HWname} | {a.subject} | Points Possible: {a.points_possible} | Due: {a.deadline.strftime('%Y-%m-%d %H:%M')} | Status: {a.status} {points_str}"
                 listbox.insert(tk.END, line)
 
         refresh_list()

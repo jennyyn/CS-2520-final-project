@@ -41,8 +41,8 @@ class HomeworkHelperGUI(HWHelperInterface):
         self.gpaCalc = GPACalculator()
 
         # Example assignments for testing
-        self.tracker.add_assignment("Essay", "English", datetime(2025,1,10,23,59), 100)
-        self.tracker.add_assignment("Program", "Python", datetime(2025,1,5,12,0), 150)
+        self.tracker.add_assignment("Essay", "English", datetime(2025,1,10,23,59), points_possible=100)
+        self.tracker.add_assignment("Program", "Python", datetime(2025,1,5,12,0), points_possible=150)
         self.tracker.mark_done("Essay")
         self.tracker.in_progress("Program")
 
@@ -339,24 +339,17 @@ class HomeworkHelperGUI(HWHelperInterface):
 
 
     def assignmentTracker(self):
-        tracker_window = tk.Toplevel(self.root)
-        tracker_window.title("Assignment Tracker")
-        tracker_window.geometry("700x550")
-        tracker_window.configure(bg=COLOR_BG_MAIN)
+        self.tracker_window = tk.Toplevel(self.root)
+        self.tracker_window.title("Assignment Tracker")
+        self.tracker_window.geometry("700x550")
+        self.tracker_window.configure(bg=COLOR_BG_MAIN)
 
-        card = self.card_frame(tracker_window)
+        card = self.card_frame(self.tracker_window)
         card.pack(fill="both", expand=True, padx=20, pady=20)
 
-        tk.Label(
-            card,
-            text="Assignment Tracker",
-            font=("Helvetica", 20, "bold"),
-            bg=COLOR_PANEL,
-            fg=COLOR_TITLE
-        ).pack(pady=15)
+        tk.Label( card, text="Assignment Tracker", font=("Helvetica", 20, "bold"), bg=COLOR_PANEL, fg=COLOR_TITLE).pack(pady=15)
 
-        
-        # Assignment input gui components
+        # Assignment input GUI components
         form = tk.Frame(card, bg=COLOR_PANEL)
         form.pack(padx=10, pady=10)
 
@@ -368,13 +361,13 @@ class HomeworkHelperGUI(HWHelperInterface):
         entry_subject = tk.Entry(form, width=25)
         entry_subject.grid(row=1, column=1, padx=10, pady=5)
 
-        tk.Label(form, text="Deadline (YYYY-MM-DD HH:MM):", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=2, column=0)
+        tk.Label(form, text="Deadline (YYYY-MM-DD HH:MM):", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=2, column=0, sticky="w")
         entry_deadline = tk.Entry(form, width=25)
         entry_deadline.grid(row=2, column=1, padx=10, pady=5)
 
-        tk.Label(form, text="Points Possible:", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=3, column=0)
+        tk.Label(form, text="Points Possible:", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=3, column=0, sticky="w")
         entry_points = tk.Entry(form, width=25)
-        entry_points.grid(row=2, column=1, padx=10, pady=5)
+        entry_points.grid(row=3, column=1, padx=10, pady=5)
 
         # Add new assignment
         def add_assignment_gui():
@@ -385,25 +378,37 @@ class HomeworkHelperGUI(HWHelperInterface):
 
             if not name or not subject or not deadline_text:
                 messagebox.showerror("Error", "All fields are required.")
+                self.tracker_window.lift()
+                self.tracker_window.focus_force()
                 return
 
             try:
                 deadline = datetime.strptime(deadline_text, "%Y-%m-%d %H:%M")
             except:
                 messagebox.showerror("Error", "Deadline must be in format YYYY-MM-DD HH:MM")
+                self.tracker_window.lift()
+                self.tracker_window.focus_force()
                 return
 
-            self.tracker.add_assignment(name, subject, deadline, points_possible=float(points_possible_text) if points_possible_text else None)
+            self.tracker.add_assignment(
+                name,
+                subject,
+                deadline,
+                points_possible=float(points_possible_text) if points_possible_text else None
+            )
             refresh_list()
             self.refresh_dashboard()
             messagebox.showinfo("Success", "Assignment added!")
+            self.tracker_window.lift()
+            self.tracker_window.focus_force()
 
-        
         # Delete assignment from list
         def delete_assignment_gui():
             selection = listbox.curselection()
             if not selection:
                 messagebox.showwarning("Select one", "You must select an assignment to delete.")
+                self.tracker_window.lift()
+                self.tracker_window.focus_force()
                 return
 
             index = selection[0]
@@ -415,26 +420,14 @@ class HomeworkHelperGUI(HWHelperInterface):
             )
 
             if confirm:
-                # Remove from internal list
                 self.tracker.delete_assignment(assignment.HWname)
                 refresh_list()
                 messagebox.showinfo("Deleted", "Assignment removed.")
-
-        # Add and Delete Assignment buttons
-        btn_row = tk.Frame(card, bg=COLOR_PANEL)
-        btn_row.pack(pady=5)
-
-        btn_add = tk.Button(btn_row, text="Add Assignment", command=add_assignment_gui)
-        self.style_button(btn_add)
-        btn_add.grid(row=0, column=0, padx=10)
-
-        btn_del = tk.Button(btn_row, text="Delete Assignment", command=delete_assignment_gui)
-        self.style_button(btn_del)
-        btn_del.grid(row=0, column=1, padx=10)
-
+                self.tracker_window.lift()
+                self.tracker_window.focus_force()
 
         # Listbox for assignment display
-        list_frame = tk.Frame(tracker_window)
+        list_frame = tk.Frame(self.tracker_window)
         list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         scrollbar = tk.Scrollbar(list_frame)
@@ -444,7 +437,6 @@ class HomeworkHelperGUI(HWHelperInterface):
         listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=listbox.yview)
 
-        # Update the listbox in gui
         def refresh_list():
             listbox.delete(0, tk.END)
             for a in self.tracker.list_assignments():
@@ -458,6 +450,8 @@ class HomeworkHelperGUI(HWHelperInterface):
             selection = listbox.curselection()
             if not selection:
                 messagebox.showwarning("Select one", "You must select an assignment.")
+                self.tracker_window.lift()
+                self.tracker_window.focus_force()
                 return
             name = self.tracker.list_assignments()[selection[0]].HWname
             self.tracker.in_progress(name)
@@ -468,6 +462,8 @@ class HomeworkHelperGUI(HWHelperInterface):
             selection = listbox.curselection()
             if not selection:
                 messagebox.showwarning("Select one", "You must select an assignment.")
+                self.tracker_window.lift()
+                self.tracker_window.focus_force()
                 return
             name = self.tracker.list_assignments()[selection[0]].HWname
             self.tracker.mark_done(name)
@@ -478,14 +474,14 @@ class HomeworkHelperGUI(HWHelperInterface):
             selection = listbox.curselection()
             if not selection:
                 messagebox.showwarning("Select one", "You must select an assignment.")
+                self.tracker_window.lift()
+                self.tracker_window.focus_force()
                 return
-            
+        
             assignment = self.tracker.list_assignments()[selection[0]]
             name = assignment.HWname
-            points_possible = assignment.points_possible
-            
-            # popup to ask for points earned
-            popup = tk.Toplevel(tracker_window)
+
+            popup = tk.Toplevel(self.tracker_window)
             popup.title(f"Grade Assignment: {name}")
             popup.geometry("300x150")
             popup.configure(bg=COLOR_BG_MAIN)
@@ -500,37 +496,47 @@ class HomeworkHelperGUI(HWHelperInterface):
                 except ValueError:
                     messagebox.showerror("Error", "Please enter a valid number for points earned.")
                     return
-                
-                # Check that the assignment has points_possible
+
                 if assignment.points_possible is None:
                     messagebox.showerror("Error", "This assignment has no 'points possible' set.")
                     return
 
-                # Save grade
-                self.tracker.mark_graded(name, points_earned)
+                self.tracker.mark_graded(name, points_earned, assignment.points_possible)
                 popup.destroy()
                 refresh_list()
                 self.refresh_dashboard()
                 messagebox.showinfo("Success", "Assignment marked as graded.")
-            
+                self.tracker_window.lift()
+                self.tracker_window.focus_force()
+
             submit_btn = tk.Button(popup, text="Submit Grade", command=submit_grade)
             self.style_button(submit_btn)
             submit_btn.pack(pady=10)
 
-        btn_frame = tk.Frame(card, bg=COLOR_PANEL)
-        btn_frame.pack(pady=10)
+        # Buttons row
+        btn_row = tk.Frame(card, bg=COLOR_PANEL)
+        btn_row.pack(pady=10)
 
-        btn_prog = tk.Button(btn_frame, text="Mark In Progress", command=mark_in_progress)
+        btn_add = tk.Button(btn_row, text="Add Assignment", command=add_assignment_gui)
+        self.style_button(btn_add)
+        btn_add.grid(row=0, column=0, padx=10, pady=5)
+
+        btn_del = tk.Button(btn_row, text="Delete Assignment", command=delete_assignment_gui)
+        self.style_button(btn_del)
+        btn_del.grid(row=0, column=1, padx=10, pady=5)
+
+        btn_prog = tk.Button(btn_row, text="Mark In Progress", command=mark_in_progress)
         self.style_button(btn_prog)
         btn_prog.grid(row=1, column=0, padx=10)
 
-        btn_done = tk.Button(btn_frame, text="Mark Done", command=mark_done)
+        btn_done = tk.Button(btn_row, text="Mark Done", command=mark_done)
         self.style_button(btn_done)
         btn_done.grid(row=1, column=1, padx=10)
 
-        btn_graded = tk.Button(btn_frame, text="Mark Graded", command=mark_graded)
+        btn_graded = tk.Button(btn_row, text="Mark Graded", command=mark_graded)
         self.style_button(btn_graded)
         btn_graded.grid(row=1, column=2, padx=10)
+
 
 
     def whatIf(self):

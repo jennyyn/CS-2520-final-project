@@ -24,14 +24,14 @@ class AssignmentTracker:
     def __init__(self):
         self.assignments = []
     
-    def add_assignment(self, HWname: str, subject: str, deadline: datetime, status: str = "not started"):
+    def add_assignment(self, HWname: str, subject: str, deadline: datetime, status: str = "not started", points_possible: float = None):
         """Adds an assignment to the list."""
-        new_assignment = Assignment(HWname, subject, deadline, status)
+        new_assignment = Assignment(HWname, subject, deadline, status, points_possible=points_possible)
         self.assignments.append(new_assignment)
 
     def delete_assignment(self, HWname: str) -> bool:
         """Deletes an assignment."""
-        for a in self.assignments:
+        for a in list(self.assignments):
             if a.HWname.lower() == HWname.lower():
                 self.assignments.remove(a)
                 return True
@@ -51,7 +51,7 @@ class AssignmentTracker:
         return False
 
     
-    def mark_done(self, HWname: str): #Activated by a button in gui?
+    def mark_done(self, HWname: str): 
         """Marks an assignment as done"""
         for a in self.assignments:
             if a.HWname.lower() == HWname.lower():
@@ -59,16 +59,26 @@ class AssignmentTracker:
                 return True
         return False
     
-    def mark_graded(self, HWname: str, points_earned: float):
-        """Marks an assignment as graded with points earned and possible"""
+    def mark_graded(self, HWname: str, points_earned: float, points_possible: float):
+        """Marks an assignment as graded with points earned and points possible."""
         for a in self.assignments:
             if a.HWname.lower() == HWname.lower():
-                if a.points_possible is None or a.points_possible <= 0:
-                    return False  # Cannot mark as graded if points possible is not set
-                
-                a.status = "graded"
+            
+                # Store points
                 a.points_earned = points_earned
-                a.grade = (points_earned / a.points_possible) * 100
+                a.points_possible = points_possible
+
+                # Calculate grade safely
+                if points_possible > 0:
+                    a.grade = (points_earned / points_possible) * 100
+                else:
+                    a.grade = None  # invalid case
+
+                # Update status
+                a.status = "graded"
+
                 return True
+    
         return False
+
     

@@ -441,14 +441,26 @@ class HomeworkHelperGUI(HWHelperInterface):
         def refresh_list():
             listbox.delete(0, tk.END)
             for a in self.tracker.list_assignments():
+                
+
                 # Show points only if graded
                 if a.status.lower() == "graded":
                     points_str = f"{a.points_earned}/{a.points_possible}"
+                    grade = a.points_earned/a.points_possible
                 else:
                    points_str = ""
+                   grade = None
 
                 line = f"{a.HWname} | {a.subject} | Points Possible: {a.points_possible} | Due: {a.deadline.strftime('%Y-%m-%d %H:%M')} | Status: {a.status} {points_str}"
-                listbox.insert(tk.END, line)
+                # If graded, insert as green for passing and red for failing, standard otherwise
+                if a.status == "graded" and grade >= .70:
+                    listbox.insert(tk.END, line)
+                    listbox.itemconfig(tk.END, fg="green")
+                elif a.status == "graded" and grade < .70:
+                    listbox.insert(tk.END, line)
+                    listbox.itemconfig(tk.END, fg="red")
+                else:
+                    listbox.insert(tk.END, line)
 
         refresh_list()
 

@@ -501,13 +501,21 @@ class HomeworkHelperGUI(HWHelperInterface):
                     messagebox.showerror("Error", "Please enter a valid number for points earned.")
                     return
                 
-            points_earned = submit_grade()
+                # Check that the assignment has points_possible
+                if assignment.points_possible is None:
+                    messagebox.showerror("Error", "This assignment has no 'points possible' set.")
+                    return
 
-            self.tracker.mark_graded(name, points_earned, points_possible)
-            popup.destroy()
-            refresh_list()
-            self.refresh_dashboard()
-            messagebox.showinfo("Success", "Assignment marked as graded.")
+                # Save grade
+                self.tracker.mark_graded(name, points_earned)
+                popup.destroy()
+                refresh_list()
+                self.refresh_dashboard()
+                messagebox.showinfo("Success", "Assignment marked as graded.")
+            
+            submit_btn = tk.Button(popup, text="Submit Grade", command=submit_grade)
+            self.style_button(submit_btn)
+            submit_btn.pack(pady=10)
 
         btn_frame = tk.Frame(card, bg=COLOR_PANEL)
         btn_frame.pack(pady=10)
@@ -553,12 +561,11 @@ class HomeworkHelperGUI(HWHelperInterface):
         course_entry.grid(row=0, column=1, pady=5)
 
         # assignment name
-        tk.Label(form, text="Assignment Name:", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=1, column=0, sticky="w")
+        tk.Label(form, text="Hypothetical Assignment Name:", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=1, column=0, sticky="w")
         assignment_entry = tk.Entry(form, width=30)
         assignment_entry.grid(row=1, column=1, pady=5)
 
         # hypothetical grade
-        tk.Label(win, text="Hypothetical Grade: ").pack(pady=5)
         tk.Label(form, text="Points Earned:", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=2, column=0, sticky="w")
         points_earned_entry = tk.Entry(form, width=15)
         points_earned_entry.grid(row=2, column=1, pady=5)
@@ -572,28 +579,32 @@ class HomeworkHelperGUI(HWHelperInterface):
         def add_hypothetical():
             try:
                 hypothetical = {
-                    "course": course_entry.get().strip(),
+                    "course": course_entry.get().strip().lower(),
                     "assignment": assignment_entry.get().strip(),
                     "points_earned": float(points_earned_entry.get()),
                     "points_possible": float(max_points_entry.get())
                 }
-                hypothetical_assignments.append(hypothetical)
-                messagebox.showinfo("Success", "Hypothetical assignment added!")
             except ValueError:
                 messagebox.showerror("Error", "Please enter valid numeric values for points.")
+                return
+            
+            if not hypothetical["name"] or not hypothetical["course"]:
+                messagebox.showerror("Error", "Course or Assignment Name cannot be empty.")
+                return
+            
+            hypothetical_assignments.append(hypothetical)
+            messagebox.showinfo("Added", f"Hypothetical assignment '{hypothetical['assignment']}' added for course '{hypothetical['course']}'.")
 
         def calculate_outcome():
-            # gather real assignments for chosen subject
+            course_name = course_entry.get().strip().lower()
+
+            # gather real graded assignments for chosen subject
             real_assignments = [
                 a for a in self.tracker.assignments
-                if a.subject.lower() == course_entry.get().lower()
+                if a.subject.lower() == course_name
+                and a.points_earned is not None
+                and a.points_possible is not None
             ]
-            
-            # convert them to point totals
-            for a in real_assignments:
-                if a.pointsEarned is None and a.maxPoints is None:
-                    # skip ungraded assignmnents
-                    pass
 
             # add hypothetical assignments
             for h in hypothetical_assignments:
@@ -601,9 +612,9 @@ class HomeworkHelperGUI(HWHelperInterface):
                     name=h["assignment"],
                     subject=h["course"],
                     deadline=datetime.now(),  # placeholder
-                    points_earned=h["points_earned"],
                     points_possible=h["points_possible"]
                 )
+                a.points_earned = h["points_earned"]
                 real_assignments.append(a)
 
             # calculate new grade

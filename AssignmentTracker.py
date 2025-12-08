@@ -14,7 +14,7 @@ class Assignment:
         self.status = status
 
         self.points_earned = None  # Points earned for the assignment
-        self.points_possible = None  # Total possible points for the assignment
+        self.points_possible = points_possible  # Total possible points for the assignment
         self.grade = None  # Grade percentage for the assignment
 
 
@@ -63,9 +63,12 @@ class AssignmentTracker:
         """Marks an assignment as graded with points earned and possible"""
         for a in self.assignments:
             if a.HWname.lower() == HWname.lower():
+                if a.points_possible is None or a.points_possible <= 0:
+                    return False  # Cannot mark as graded if points possible is not set
+                
                 a.status = "graded"
                 a.points_earned = points_earned
-                a.grade = (points_earned / a.points_possible) * 100 if points_possible > 0 else None
+                a.grade = (points_earned / a.points_possible) * 100
                 return True
         return False
     

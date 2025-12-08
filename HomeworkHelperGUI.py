@@ -177,7 +177,7 @@ class HomeworkHelperGUI(HWHelperInterface):
         for widget in self.upcoming_list_frame.winfo_children():
             widget.destroy()
 
-        assignments = self.tracker.list_assignments()
+        assignments = [a for a in self.tracker.list_assignments() if a.status not in ("done", "graded")]
 
         if not assignments:
             tk.Label(
@@ -422,6 +422,7 @@ class HomeworkHelperGUI(HWHelperInterface):
             if confirm:
                 self.tracker.delete_assignment(assignment.HWname)
                 refresh_list()
+                self.refresh_dashboard()
                 messagebox.showinfo("Deleted", "Assignment removed.")
                 self.tracker_window.lift()
                 self.tracker_window.focus_force()

@@ -288,10 +288,7 @@ class HomeworkHelperGUI(HWHelperInterface):
             self.refresh_dashboard()
             messagebox.showinfo("Success", "Assignment added!")
 
-        btn_add = tk.Button(card, text="Add Assignment", command=add_assignment_gui)
-        self.style_button(btn_add)
-        btn_add.pack(pady=5)
-
+        
         # Delete assignment from list
         def delete_assignment_gui():
             selection = listbox.curselection()
@@ -311,6 +308,19 @@ class HomeworkHelperGUI(HWHelperInterface):
                 self.tracker.assignments.remove(assignment)
                 refresh_list()
                 messagebox.showinfo("Deleted", "Assignment removed.")
+
+        # Add and Delete Assignment buttons
+        btn_row = tk.Frame(card, bg=COLOR_PANEL)
+        btn_row.pack(pady=5)
+
+        btn_add = tk.Button(btn_row, text="Add Assignment", command=add_assignment_gui)
+        self.style_button(btn_add)
+        btn_add.grid(row=0, column=0, padx=10)
+
+        btn_del = tk.Button(btn_row, text="Delete Assignment", command=delete_assignment_gui)
+        self.style_button(btn_del)
+        btn_del.grid(row=0, column=1, padx=10)
+
 
         # Listbox for assignment display
         list_frame = tk.Frame(tracker_window)
@@ -358,11 +368,11 @@ class HomeworkHelperGUI(HWHelperInterface):
 
         btn_prog = tk.Button(btn_frame, text="Mark In Progress", command=mark_in_progress)
         self.style_button(btn_prog)
-        btn_prog.grid(row=0, column=0, padx=10)
+        btn_prog.grid(row=1, column=0, padx=10)
 
         btn_done = tk.Button(btn_frame, text="Mark Done", command=mark_done)
         self.style_button(btn_done)
-        btn_done.grid(row=0, column=1, padx=10)
+        btn_done.grid(row=1, column=1, padx=10)
 
 
     def whatIf(self):

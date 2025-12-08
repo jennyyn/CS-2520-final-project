@@ -27,7 +27,7 @@ class HomeworkHelperGUI(HWHelperInterface):
         # create main window
         self.root = tk.Tk()
         self.root.title("Homework Helper")
-        self.root.geometry("900x600")
+        self.root.geometry("1800x1000")
         self.root.configure(bg=COLOR_BG_MAIN)
 
         #initalize RewardSystem
@@ -231,7 +231,112 @@ class HomeworkHelperGUI(HWHelperInterface):
         )
 
     def gpaCalculator(self):
-        messagebox.showinfo("GPA Calculator", "This feature will calculate your GPA based on your grades.")
+        """GPA Calculator Window"""
+        gpa_window = tk.Toplevel(self.root)
+        gpa_window.title("GPA Calculator")
+        gpa_window.geometry("600x700")
+        gpa_window.configure(bg=COLOR_BG_MAIN)
+
+        card = self.card_frame(gpa_window)
+        card.pack(fill="both", expand=True, padx=20, pady=20)
+
+        tk.Label(
+            card,
+            text="GPA Calculator",
+            font=("Helvetica", 20, "bold"),
+            bg=COLOR_PANEL,
+            fg=COLOR_TITLE
+        ).pack(pady=15)
+
+        # Input Form
+        form = tk.Frame(card, bg=COLOR_PANEL)
+        form.pack(padx=10, pady=10)
+
+        tk.Label(form, text="Course Name:", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=0, column=0, sticky="w")
+        entry_course = tk.Entry(form, width=20)
+        entry_course.grid(row=0, column=1, padx=5, pady=5)
+
+        tk.Label(form, text="Credits:", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=1, column=0, sticky="w")
+        entry_credits = tk.Entry(form, width=10)
+        entry_credits.grid(row=1, column=1, padx=5, pady=5)
+
+        tk.Label(form, text="Grade (Letter):", bg=COLOR_PANEL, fg=COLOR_TEXT).grid(row=2, column=0, sticky="w")
+        
+        entry_grade = tk.Entry(form, width=10)
+        entry_grade.grid(row=2, column=1, padx=5, pady=5)
+
+        # Labels for GPA display
+        lbl_current_gpa = tk.Label(
+            card, 
+            text="Current GPA: 0.00", 
+            font=("Helvetica", 16, "bold"), 
+            bg=COLOR_PANEL, 
+            fg=COLOR_TITLE
+        )
+
+        # Listbox
+        list_frame = tk.Frame(card, bg=COLOR_PANEL)
+        list_frame.pack(fill="both", expand=True, padx=20, pady=5)
+        
+        scrollbar = tk.Scrollbar(list_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        listbox = tk.Listbox(
+            list_frame, 
+            height=8, 
+            yscrollcommand=scrollbar.set,
+            font=("Helvetica", 12)
+        )
+        listbox.pack(side=tk.LEFT, fill="both", expand=True)
+        scrollbar.config(command=listbox.yview)
+
+        def update_display():
+            # refresh listbox
+            listbox.delete(0, tk.END)
+            for c in self.gpaCalc.get_courses():
+                listbox.insert(tk.END, str(c))
+            
+            # refresh GPA label
+            gpa = self.gpaCalc.calculate_gpa()
+            lbl_current_gpa.config(text=f"Current GPA: {gpa:.2f}")
+            
+            # Also refresh the main dashboard GPA if needed
+            self.refresh_dashboard()
+
+        def add_course_action():
+            c_name = entry_course.get().strip()
+            c_credits_str = entry_credits.get().strip()
+            c_grade = entry_grade.get().strip()
+
+            if not c_name or not c_credits_str or not c_grade:
+                messagebox.showerror("Error", "All fields are required.")
+                return
+
+            try:
+                c_credits = float(c_credits_str)
+            except ValueError:
+                messagebox.showerror("Error", "Credits must be a number.")
+                return
+
+            new_course = Course(c_name, c_grade, c_credits)
+            self.gpaCalc.add_course(new_course)
+            
+            # Clear inputs
+            entry_course.delete(0, tk.END)
+            entry_credits.delete(0, tk.END)
+            entry_grade.delete(0, tk.END)
+            
+            update_display()
+
+        btn_add = tk.Button(form, text="Add Course", command=add_course_action)
+        self.style_button(btn_add)
+        btn_add.grid(row=3, column=0, columnspan=2, pady=10)
+
+        lbl_current_gpa.pack(pady=10)
+
+        # Initial Load
+        update_display()
+
 
     def assignmentTracker(self):
         tracker_window = tk.Toplevel(self.root)

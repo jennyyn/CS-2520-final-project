@@ -441,8 +441,6 @@ class HomeworkHelperGUI(HWHelperInterface):
         def refresh_list():
             listbox.delete(0, tk.END)
             for a in self.tracker.list_assignments():
-                
-
                 # Show points only if graded
                 if a.status.lower() == "graded":
                     points_str = f"{a.points_earned}/{a.points_possible}"

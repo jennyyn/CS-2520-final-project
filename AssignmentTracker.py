@@ -17,7 +17,6 @@ class Assignment:
         self.points_possible = points_possible  # Total possible points for the assignment
         self.grade = None  # Grade percentage for the assignment
 
-
 class AssignmentTracker:
     """Tracks and organizes assignments by due date"""
     
@@ -37,7 +36,6 @@ class AssignmentTracker:
                 return True
         return False
 
-    
     def list_assignments(self):
         """Returns assignments sorted by deadline."""
         return sorted(self.assignments, key=lambda a: a.deadline)
@@ -49,7 +47,6 @@ class AssignmentTracker:
                 a.status ="in progress"
                 return True
         return False
-
     
     def mark_done(self, HWname: str): 
         """Marks an assignment as done"""
@@ -80,5 +77,3 @@ class AssignmentTracker:
                 return True
     
         return False
-
-    

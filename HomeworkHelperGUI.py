@@ -41,8 +41,8 @@ class HomeworkHelperGUI(HWHelperInterface):
         self.gpaCalc = GPACalculator()
 
         # Example assignments for testing
-        self.tracker.add_assignment("Essay", "English", datetime(2025,1,10,23,59))
-        self.tracker.add_assignment("Program", "Python", datetime(2025,1,5,12,0))
+        self.tracker.add_assignment("Essay", "English", datetime(2025,1,10,23,59), "done", 100)
+        self.tracker.add_assignment("Program", "Python", datetime(2025,1,5,12,0), "in progress", 150)
         self.tracker.mark_done("Essay")
         self.tracker.in_progress("Program")
 

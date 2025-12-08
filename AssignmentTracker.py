@@ -21,8 +21,18 @@ class AssignmentTracker:
         self.assignments = []
     
     def add_assignment(self, HWname: str, subject: str, deadline: datetime, status: str = "not started"):
+        """Adds an assignment to the list."""
         new_assignment = Assignment(HWname, subject, deadline, status)
         self.assignments.append(new_assignment)
+
+    def delete_assignment(self, HWname: str) -> bool:
+        """Deletes an assignment."""
+        for a in self.assignments:
+            if a.HWname.lower() == HWname.lower():
+                self.assignments.remove(a)
+                return True
+        return False
+
     
     def list_assignments(self):
         """Returns assignments sorted by deadline."""

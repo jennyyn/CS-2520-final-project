@@ -303,9 +303,10 @@ class HomeworkHelperGUI(HWHelperInterface):
                 "Confirm Delete",
                 f"Delete assignment '{assignment.HWname}'?"
             )
+            
             if confirm:
                 # Remove from internal list
-                self.tracker.assignments.remove(assignment)
+                self.tracker.delete_assignment(assignment.HWname)
                 refresh_list()
                 messagebox.showinfo("Deleted", "Assignment removed.")
 

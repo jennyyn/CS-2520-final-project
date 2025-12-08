@@ -181,7 +181,7 @@ class HomeworkHelperGUI(HWHelperInterface):
         compAssignments = [a for a in self.tracker.list_assignments() if a.status in ("done", "graded")]
         progAssignments = [a for a in self.tracker.list_assignments() if a.status not in ("done", "graded")]
 
-        if not assignments:
+        if not progAssignments:
             tk.Label(
                 self.upcoming_list_frame,
                 text="No upcoming assignments!",

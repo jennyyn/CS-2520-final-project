@@ -177,7 +177,9 @@ class HomeworkHelperGUI(HWHelperInterface):
         for widget in self.upcoming_list_frame.winfo_children():
             widget.destroy()
 
-        assignments = [a for a in self.tracker.list_assignments() if a.status not in ("done", "graded")]
+        assignments = [a for a in self.tracker.list_assignments()]
+        compAssignments = [a for a in self.tracker.list_assignments() if a.status in ("done", "graded")]
+        progAssignments = [a for a in self.tracker.list_assignments() if a.status not in ("done", "graded")]
 
         if not assignments:
             tk.Label(
@@ -192,7 +194,7 @@ class HomeworkHelperGUI(HWHelperInterface):
             # sort by deadline
             assignments.sort(key=lambda a: a.deadline)
 
-            for a in assignments:
+            for a in progAssignments:
                 frame = tk.Frame(self.upcoming_list_frame, bg=COLOR_PANEL)
                 frame.pack(fill="x", pady=2)
 
@@ -223,8 +225,8 @@ class HomeworkHelperGUI(HWHelperInterface):
 
         # Assignment Stats
         total = len(assignments)
-        done = sum(1 for a in assignments if a.status == "done")
-        prog = sum(1 for a in assignments if a.status == "in progress")
+        done = sum(1 for a in compAssignments if a.status == "done" or "graded")
+        prog = sum(1 for a in progAssignments if a.status == "in progress")
 
         self.lbl_assignments_overview.config(
             text=f"Assignments: {done} done, {prog} in progress, {total - done - prog} not started (Total: {total})"
